@@ -17,7 +17,7 @@ var education = {
         "name": "Deen Bandhu Choturam Institute of Science and Technology",
         "location": "Murthal 131027, Haryana, India ",
         "degree": "Bachelor of technology (In progress)",
-        "majors": "Electronics and Communication Engineering",
+        "majors": ['Electronics and Communication Engineering'],
         "dates": "2014-2018",
         "url": "http://dcrustm.ac.in"
     }, ],
@@ -90,23 +90,23 @@ var projects = {
 
 };
 
-var myHeaderName = HTMLheaderName.replace("%data%", bio.name);
-var myHeaderRole = HTMLheaderRole.replace("%data%", bio.role);
-
-var myMobile = HTMLmobile.replace("%data%", bio.contacts.mobile);
-var myEmail = HTMLemail.replace("%data%", bio.contacts.email);
-var myGithub = HTMLgithub.replace("%data%", bio.contacts.github);
-var myLocation = HTMLlocation.replace("%data%", bio.contacts.location);
-
-var myContacts = [myMobile, myEmail, myGithub, myLocation];
-
-function addContacts(item) {
-    $("#topContacts, #footerContacts").append(item);
-}
-myContacts.forEach(addContacts);
-
 //for bio section
-bio.display = function appendbio() {
+bio.display = function() {
+
+    var myHeaderName = HTMLheaderName.replace("%data%", bio.name);
+    var myHeaderRole = HTMLheaderRole.replace("%data%", bio.role);
+
+    var myMobile = HTMLmobile.replace("%data%", bio.contacts.mobile);
+    var myEmail = HTMLemail.replace("%data%", bio.contacts.email);
+    var myGithub = HTMLgithub.replace("%data%", bio.contacts.github);
+    var myLocation = HTMLlocation.replace("%data%", bio.contacts.location);
+
+    var myContacts = [myMobile, myEmail, myGithub, myLocation];
+
+    function addContacts(item) {
+        $("#topContacts, #footerContacts").append(item);
+    }
+    myContacts.forEach(addContacts);
 
     var myBioPic = HTMLbioPic.replace("%data%", bio.biopic);
     var myWelcomeMsg = HTMLwelcomeMsg.replace("%data%", bio.welcomeMessage);
@@ -138,7 +138,7 @@ bio.display = function appendbio() {
 bio.display();
 
 //for work section
-work.display = function appendWork() {
+work.display = function() {
    
     var myWorkEmployer, myWorkTitle, myWorkDates, myWorkLocation, myWorkDescription;
 
@@ -150,16 +150,11 @@ work.display = function appendWork() {
         myWorkDescription = HTMLworkDescription.replace("%data%", item.description);
 
     //append data to experience section
-        $("#workExperience").append(myWorkEmployer);
-        $("#workExperience").append(myWorkTitle);
-        $("#workExperience").append(myWorkDates);
-        $("#workExperience").append(myWorkLocation);
-        $("#workExperience").append(myWorkDescription);
-
+        $("#workExperience:last").append(myWorkEmployer, myWorkTitle, myWorkDates, myWorkLocation, myWorkDescription);
     }
 
     if (work.jobs.length > 0) {
-        $("#workExperience").append(HTMLworkStart);
+        $("#workExperience:last").append(HTMLworkStart);
         work.jobs.forEach(addWork);
     }
 };
@@ -170,7 +165,7 @@ work.display();
 
 
 //for projects
-projects.display = function appendProjects() {
+projects.display = function() {
     var myprojectTitle, myProjectDates, myProjectDescription, myProjectImages;
 
     function addProject(item) {
@@ -187,12 +182,10 @@ projects.display = function appendProjects() {
     item.images.forEach(appendImages);
     
     //append data to projects section
-    $(".project-entry").append(myprojectTitle);
-    $(".project-entry").append(myProjectDates);
-    $(".project-entry").append(myProjectDescription);
+    $(".project-entry:last").append(myprojectTitle, myProjectDates, myProjectDescription);
 
     function addProjectImages(item) {
-        $(".project-entry").append(item);
+        $(".project-entry:last").append(item);
     }
     myProjectImages.forEach(addProjectImages);
     }
@@ -207,41 +200,49 @@ projects.display();
 
 
 //for education section
-education.schools.display = function appendSchools() {
+education.display = function() {
 
     //schools
-    var mySchoolName, mySchoolDegree, mySchoolDates, mySchoolLocation, mySchoolMajor;
+    var mySchoolName, mySchoolDegree, mySchoolDates, mySchoolLocation, mySchoolMajor, mySchoolMajors;
 
     function addSchool(item) {
         mySchoolName = HTMLschoolName.replace("%data%", item.name);
         mySchoolDegree = HTMLschoolDegree.replace("%data%", item.degree);
         mySchoolDates = HTMLschoolDates.replace("%data%", item.dates);
         mySchoolLocation = HTMLschoolLocation.replace("%data%", item.location);
-        mySchoolMajor = HTMLschoolMajor.replace("%data%", item.majors);
+        mySchoolMajors = [];
+        item.majors.forEach(addMajors)
+
+        function addMajors(item){
+            mySchoolMajor = HTMLschoolMajor.replace("%data%", item);
+            mySchoolMajors.push(mySchoolMajor);
+        }
 
         //append data to education-entry section
 
 
-        $(".education-entry").append(mySchoolName);
-        $(".education-entry").append(mySchoolDegree);
-        $(".education-entry").append(mySchoolDates);
-        $(".education-entry").append(mySchoolLocation);
-        $(".education-entry").append(mySchoolMajor);
+        $(".education-entry:last").append(mySchoolName, mySchoolDegree, mySchoolDates, mySchoolLocation);
+
+        mySchoolMajors.forEach(appendMajors);
+        function appendMajors(){
+            $(".education-entry:last").append(mySchoolMajor);
+        }
     }
 
     if (education.schools.length > 0) {
     $("#education").append(HTMLschoolStart);
     education.schools.forEach(addSchool);
     }
-};
-
-education.schools.display();
-
-//for classes
-education.onlineCourses.display = function appendOnlineClasses() {
-
+    //online education
     var myOnlineTitle, myOnlineSchool, myOnlineDates, myOnlineUrl;
 
+     if (education.schools.length > 0) {
+        $("#education").append(HTMLonlineClasses);
+        $("#education").append(HTMLschoolStart);
+        
+        education.onlineCourses.forEach(addOnlineClass);
+    }
+    
     function addOnlineClass(item) {
         myOnlineTitle = HTMLschoolName.replace("%data%", item.title);
         myOnlineSchool = HTMLschoolDegree.replace("%data%", item.school);
@@ -249,18 +250,11 @@ education.onlineCourses.display = function appendOnlineClasses() {
         myOnlineUrl = HTMLschoolLocation.replace("%data%", item.url);
 
         //append data to education-entry section
-        $(".education-entry").append(myOnlineTitle);
-        $(".education-entry").append(myOnlineSchool);
-        $(".education-entry").append(myOnlineDates);
-        $(".education-entry").append(myOnlineUrl);
+        $(".education-entry:last").append(myOnlineTitle, myOnlineSchool, myOnlineDates, myOnlineUrl);
     }
 
-    if (education.schools.length > 0) {
-        $(".education-entry").append(HTMLonlineClasses);
-        education.onlineCourses.forEach(addOnlineClass);
-    }
 };
 
-education.onlineCourses.display();
+education.display();
 //for google maps
 $("#mapDiv").append(googleMap);
